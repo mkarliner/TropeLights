@@ -141,7 +141,9 @@ void loop() {
       digitalWrite(WHITE_LEDS, HIGH);
       delay(flash_duration);
       digitalWrite(WHITE_LEDS, LOW);
-      delay(flash_period-flash_duration);
+      if(i!=17) {
+        delay(flash_period-flash_duration);
+      }
     } 
   }  
   else {
