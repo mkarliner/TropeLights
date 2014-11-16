@@ -74,7 +74,7 @@ void setup() {
   //Setup the LCD
   lcd.begin (16,2);
   lcd.setBacklightPin(BACKLIGHT_PIN,POSITIVE);
-  lcd.setBacklight(HIGH);
+  lcd.setBacklight(LOW);
   lcd.home (); 
   //  pinMode(led_pin, OUTPUT);
   pinMode(WHITE_LEDS, OUTPUT);
@@ -110,6 +110,8 @@ void setup() {
 
 void loop() {
   char rpm_buf[5];
+  static int lcd_status = 0;
+  static int white_led_status = 1;
 
   //while(mag_sensor() == false); // Wait for sensor
   while(start_of_revolution == 0){
@@ -133,7 +135,7 @@ void loop() {
   lcd.print("    ");
   lcd.setCursor ( 12, 0); 
   lcd.print(period);
-  if(flash_period > 50 && flash_period < 150) { 
+  if(flash_period > 50 && flash_period < 150 && white_led_status) { 
     lcd.setCursor (5,0);        
     lcd.print(rpm_buf);   
     analogWrite(WHITE_LEDS, 0);
@@ -158,12 +160,26 @@ void loop() {
       printf("Yahoo\n");
     }
     switch(rval) {
-    case 0x629D:
+    case 0x629D:  //Up arrow
       flash_duration++;
       break;
-    case 0xa857:
+    case 0xa857:  //Down arrow
       flash_duration--;
       break;
+    case 0x42BD: //Star
+      if(lcd_status == 0) {
+        lcd.setBacklight(HIGH);
+        lcd_status = 1;
+      } 
+      else {
+        lcd.setBacklight(LOW);
+        lcd_status = 0;
+      }
+      break;
+    case 0x6897:  //1 
+      white_led_status = !white_led_status;
+      break;
+
     default:
       printf("Unknown IR code %x\n", rval);
     }
@@ -183,6 +199,7 @@ void loop() {
 
 
 }
+
 
 
 
